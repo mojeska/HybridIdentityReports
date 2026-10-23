@@ -5,6 +5,13 @@
 Report scripts for hybrid AD + Entra ID environments. All read-only. Pipe to
 `Export-Csv` or `Format-Table` as needed.
 
+## Disclaimer
+
+> [!WARNING]
+> **Use at your own risk.** These scripts are provided as-is, with no warranty or guarantee of any kind. The author accepts no liability for any damage, data loss, downtime or other problems that result from using them.
+>
+> Read and understand anything before you run it, do your own research, and test in a lab before using it in production. See the [MIT License](LICENSE) for the full terms.
+
 ## Setup
 
 ```powershell

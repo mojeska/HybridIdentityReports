@@ -17,10 +17,17 @@ param(
 #Requires -Modules ActiveDirectory
 
 $pdc = (Get-ADDomain).PDCEmulator
-$events = Get-WinEvent -ComputerName $pdc -ErrorAction SilentlyContinue -FilterHashtable @{
-    LogName   = 'Security'
-    Id        = 4740
-    StartTime = (Get-Date).AddHours(-$Hours)
+# No lockouts in the window is normal; anything else (access denied, PDC down) is a real error
+try {
+    $events = Get-WinEvent -ComputerName $pdc -ErrorAction Stop -FilterHashtable @{
+        LogName   = 'Security'
+        Id        = 4740
+        StartTime = (Get-Date).AddHours(-$Hours)
+    }
+}
+catch {
+    if ($_.FullyQualifiedErrorId -notlike 'NoMatchingEventsFound*') { throw }
+    $events = @()
 }
 
 $events | ForEach-Object {

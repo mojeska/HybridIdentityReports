@@ -56,7 +56,7 @@ Links: [Microsoft Graph PowerShell](https://learn.microsoft.com/powershell/micro
 | Script | What | Scopes |
 | --- | --- | --- |
 | `Get-HybridSyncStatus.ps1` | Last directory sync time and users with sync errors (duplicate UPN, proxyAddress); errors are in `.ProvisioningErrors` | Organization.Read.All, User.Read.All |
-| `Compare-ADEntraUsers.ps1` | Enabled in AD but missing from Entra (out of sync scope), or disabled in AD but still enabled in Entra | User.Read.All + AD module |
+| `Compare-ADEntraUsers.ps1` | Enabled in AD but missing from Entra (out of sync scope), or disabled in AD but still enabled in Entra. Matches on SID, so .local UPNs are fine | User.Read.All + AD module |
 
 On the Entra Connect server itself:
 

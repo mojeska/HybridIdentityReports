@@ -25,9 +25,9 @@ foreach ($g in $Group) {
             SamAccountName       = $u.SamAccountName
             Name                 = $u.Name
             Enabled              = $u.Enabled
-            PasswordAgeDays      = if ($u.PasswordLastSet) { [int]((Get-Date) - $u.PasswordLastSet).TotalDays }
+            PasswordAgeDays      = $(if ($u.PasswordLastSet) { [int]((Get-Date) - $u.PasswordLastSet).TotalDays })
             PasswordNeverExpires = $u.PasswordNeverExpires
-            LastLogon            = if ($u.lastLogonTimestamp) { [datetime]::FromFileTime($u.lastLogonTimestamp) }
+            LastLogon            = $(if ($u.lastLogonTimestamp) { [datetime]::FromFileTime($u.lastLogonTimestamp) })
         }
     }
 }

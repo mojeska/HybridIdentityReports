@@ -12,18 +12,19 @@ jobs:
       matrix:
         shell: [pwsh, powershell]   # PowerShell 7 and Windows PowerShell 5.1
     name: test (${{ matrix.shell }})
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Install test modules
-        shell: ${{ matrix.shell }}
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
           Install-Module Pester -MinimumVersion 5.5 -Force -SkipPublisherCheck
           Install-Module PSScriptAnalyzer -Force
 
       - name: Run tests
-        shell: ${{ matrix.shell }}
         run: |
           $result = Invoke-Pester -Path ./Tests -Output Detailed -PassThru
           if ($result.FailedCount -gt 0) { exit 1 }

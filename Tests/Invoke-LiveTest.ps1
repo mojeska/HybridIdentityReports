@@ -71,8 +71,11 @@ $results = foreach ($c in $cases) {
     Write-Host "Running $name ..." -NoNewline
     $ev = $null
     $sw = [Diagnostics.Stopwatch]::StartNew()
+    # 2>&1 rather than -ErrorVariable: ErrorVariable also records errors the script caught itself
     try {
-        $out = @(& $path @scriptArgs -ErrorVariable ev -WarningVariable wv)
+        $all = @(& $path @scriptArgs -WarningVariable wv 2>&1)
+        $ev = @($all | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+        $out = @($all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] })
         $fatal = $null
     }
     catch { $out = @(); $fatal = $_ }

@@ -8,6 +8,8 @@ give more detail.
 .EXAMPLE
 Connect-MgGraph -Scopes Organization.Read.All, User.Read.All
 .\Get-HybridSyncStatus.ps1
+.EXAMPLE
+(.\Get-HybridSyncStatus.ps1).ProvisioningErrors | Export-Csv sync-errors.csv -NoTypeInformation
 #>
 [CmdletBinding()]
 param(
@@ -19,20 +21,10 @@ $org = Get-MgOrganization
 $last = $org.OnPremisesLastSyncDateTime
 $minutes = if ($last) { [int]((Get-Date).ToUniversalTime() - $last.ToUniversalTime()).TotalMinutes }
 
-[pscustomobject]@{
-    Tenant          = $org.DisplayName
-    SyncEnabled     = $org.OnPremisesSyncEnabled
-    LastSync        = $last
-    MinutesAgo      = $minutes
-    Healthy         = [bool]($org.OnPremisesSyncEnabled -and $null -ne $minutes -and $minutes -le $WarnMinutes)
-} | Format-List
-
 # Users with sync (provisioning) errors, e.g. duplicate UPN or proxyAddress
 $errors = Get-MgUser -All -Property DisplayName, UserPrincipalName, OnPremisesSyncEnabled, OnPremisesProvisioningErrors |
-    Where-Object { $_.OnPremisesProvisioningErrors }
-
-if ($errors) {
-    $errors | ForEach-Object {
+    Where-Object { $_.OnPremisesProvisioningErrors } |
+    ForEach-Object {
         foreach ($e in $_.OnPremisesProvisioningErrors) {
             [pscustomobject]@{
                 User     = $_.UserPrincipalName
@@ -43,6 +35,13 @@ if ($errors) {
             }
         }
     }
-} else {
-    Write-Output 'No user provisioning errors.'
+
+[pscustomobject]@{
+    Tenant             = $org.DisplayName
+    SyncEnabled        = $org.OnPremisesSyncEnabled
+    LastSync           = $last
+    MinutesAgo         = $minutes
+    Healthy            = [bool]($org.OnPremisesSyncEnabled -and $null -ne $minutes -and $minutes -le $WarnMinutes)
+    ErrorCount         = @($errors).Count
+    ProvisioningErrors = @($errors)
 }
